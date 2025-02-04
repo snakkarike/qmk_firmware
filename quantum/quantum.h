@@ -194,6 +194,15 @@ extern layer_state_t layer_state;
 #    include "digitizer.h"
 #endif
 
+#ifdef SIGNALRGB_SUPPORT_ENABLE
+#    include "signalrgb.h"
+#endif
+
+
+#ifdef OPENRGB_ENABLE
+#    include "openrgb.h"
+#endif
+
 #ifdef VIA_ENABLE
 #    include "via.h"
 #endif
@@ -240,11 +249,6 @@ extern layer_state_t layer_state;
 #    include "os_detection.h"
 #endif
 
-#ifdef LAYER_LOCK_ENABLE
-#    include "layer_lock.h"
-#endif
-
-void set_single_default_layer(uint8_t default_layer);
 void set_single_persistent_default_layer(uint8_t default_layer);
 
 #define IS_LAYER_ON(layer) layer_state_is(layer)

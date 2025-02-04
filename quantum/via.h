@@ -143,9 +143,12 @@ enum via_qmk_audio_value {
     id_qmk_audio_clicky_enable = 2,
 };
 
+
 // Can be called in an overriding via_init_kb() to test if keyboard level code usage of
 // EEPROM is invalid and use/save defaults.
 bool via_eeprom_is_valid(void);
+
+extern bool is_signalrgb_active;
 
 // Sets VIA/keyboard level usage of EEPROM to valid/invalid
 // Keyboard level code (eg. via_init_kb()) should not call this
@@ -159,6 +162,16 @@ void via_init(void);
 uint32_t via_get_layout_options(void);
 void     via_set_layout_options(uint32_t value);
 void     via_set_layout_options_kb(uint32_t value);
+
+//Used to handle SignalRGB Compatibility
+void get_qmk_version(void);
+void get_signalrgb_protocol_version(void);
+void get_unique_identifier(void);
+void led_streaming(uint8_t *data);
+void signalrgb_mode_enable(void);
+void signalrgb_mode_disable(void);
+void signalrgb_total_leds(void);
+void signalrgb_firmware_type(void);
 
 // Used by VIA to tell a device to flash LEDs (or do something else) when that
 // device becomes the active device being configured, on startup or switching

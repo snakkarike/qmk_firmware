@@ -28,7 +28,6 @@ QUANTUM_SRC += \
     $(QUANTUM_DIR)/sync_timer.c \
     $(QUANTUM_DIR)/logging/debug.c \
     $(QUANTUM_DIR)/logging/sendchar.c \
-    $(QUANTUM_DIR)/process_keycode/process_default_layer.c \
 
 VPATH += $(QUANTUM_DIR)/logging
 # Fall back to lib/printf if there is no platform provided print
@@ -130,13 +129,13 @@ ifeq ($(strip $(POINTING_DEVICE_ENABLE)), yes)
         MOUSE_ENABLE := yes
         VPATH += $(QUANTUM_DIR)/pointing_device
         SRC += $(QUANTUM_DIR)/pointing_device/pointing_device.c
+        SRC += $(QUANTUM_DIR)/pointing_device/pointing_device_drivers.c
         SRC += $(QUANTUM_DIR)/pointing_device/pointing_device_auto_mouse.c
         ifneq ($(strip $(POINTING_DEVICE_DRIVER)), custom)
             SRC += drivers/sensors/$(strip $(POINTING_DEVICE_DRIVER)).c
             OPT_DEFS += -DPOINTING_DEVICE_DRIVER_$(strip $(shell echo $(POINTING_DEVICE_DRIVER) | tr '[:lower:]' '[:upper:]'))
         endif
         OPT_DEFS += -DPOINTING_DEVICE_DRIVER_$(strip $(POINTING_DEVICE_DRIVER))
-        OPT_DEFS += -DPOINTING_DEVICE_DRIVER_NAME=$(strip $(POINTING_DEVICE_DRIVER))
         ifeq ($(strip $(POINTING_DEVICE_DRIVER)), adns9800)
             SPI_DRIVER_REQUIRED = yes
         else ifeq ($(strip $(POINTING_DEVICE_DRIVER)), analog_joystick)
@@ -216,7 +215,7 @@ else
         COMMON_VPATH += $(PLATFORM_PATH)/$(PLATFORM_KEY)/$(DRIVER_DIR)/flash
         COMMON_VPATH += $(DRIVER_PATH)/flash
         SRC += eeprom_driver.c eeprom_legacy_emulated_flash.c legacy_flash_ops.c
-      else ifneq ($(filter $(MCU_SERIES),STM32F1xx STM32F3xx STM32F4xx STM32L4xx STM32G4xx WB32F3G71xx WB32FQ95xx AT32F415 GD32VF103),)
+      else ifneq ($(filter $(MCU_SERIES),STM32F1xx STM32F3xx STM32F4xx STM32L4xx STM32G4xx WB32F3G71xx WB32FQ95xx GD32VF103),)
         # Wear-leveling EEPROM implementation, backed by MCU flash
         OPT_DEFS += -DEEPROM_DRIVER -DEEPROM_WEAR_LEVELING
         SRC += eeprom_driver.c eeprom_wear_leveling.c
@@ -239,6 +238,10 @@ else
         OPT_DEFS += -DEEPROM_DRIVER -DEEPROM_TRANSIENT
         SRC += eeprom_driver.c eeprom_transient.c
       endif
+    else ifeq ($(PLATFORM),ARM_ATSAM)
+      # arm_atsam EEPROM
+      OPT_DEFS += -DEEPROM_SAMD
+      SRC += eeprom_samd.c
     else ifeq ($(PLATFORM),TEST)
       # Test harness "EEPROM"
       OPT_DEFS += -DEEPROM_TEST_HARNESS
@@ -307,11 +310,11 @@ ifeq ($(strip $(RGBLIGHT_ENABLE)), yes)
         POST_CONFIG_H += $(QUANTUM_DIR)/rgblight/rgblight_post_config.h
         OPT_DEFS += -DRGBLIGHT_ENABLE
         OPT_DEFS += -DRGBLIGHT_$(strip $(shell echo $(RGBLIGHT_DRIVER) | tr '[:lower:]' '[:upper:]'))
-        SRC += $(QUANTUM_DIR)/process_keycode/process_underglow.c
         SRC += $(QUANTUM_DIR)/color.c
         SRC += $(QUANTUM_DIR)/rgblight/rgblight.c
         SRC += $(QUANTUM_DIR)/rgblight/rgblight_drivers.c
         CIE1931_CURVE := yes
+        RGB_KEYCODES_ENABLE := yes
     endif
 
     ifeq ($(strip $(RGBLIGHT_DRIVER)), ws2812)
@@ -433,13 +436,6 @@ ifeq ($(strip $(LED_MATRIX_ENABLE)), yes)
         SRC += snled27351-mono.c
     endif
 
-    ifeq ($(strip $(LED_MATRIX_CUSTOM_KB)), yes)
-        OPT_DEFS += -DLED_MATRIX_CUSTOM_KB
-    endif
-
-    ifeq ($(strip $(LED_MATRIX_CUSTOM_USER)), yes)
-        OPT_DEFS += -DLED_MATRIX_CUSTOM_USER
-    endif
 endif
 
 # Deprecated driver names - do not use
@@ -464,16 +460,12 @@ ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
     COMMON_VPATH += $(QUANTUM_DIR)/rgb_matrix/animations
     COMMON_VPATH += $(QUANTUM_DIR)/rgb_matrix/animations/runners
     POST_CONFIG_H += $(QUANTUM_DIR)/rgb_matrix/post_config.h
-
-    # TODO: Remove this
-    SRC += $(QUANTUM_DIR)/process_keycode/process_underglow.c
-
-    SRC += $(QUANTUM_DIR)/process_keycode/process_rgb_matrix.c
     SRC += $(QUANTUM_DIR)/color.c
     SRC += $(QUANTUM_DIR)/rgb_matrix/rgb_matrix.c
     SRC += $(QUANTUM_DIR)/rgb_matrix/rgb_matrix_drivers.c
     LIB8TION_ENABLE := yes
     CIE1931_CURVE := yes
+    RGB_KEYCODES_ENABLE := yes
 
     ifeq ($(strip $(RGB_MATRIX_DRIVER)), aw20216s)
         SPI_DRIVER_REQUIRED = yes
@@ -576,6 +568,10 @@ ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
     endif
 endif
 
+ifeq ($(strip $(RGB_KEYCODES_ENABLE)), yes)
+    SRC += $(QUANTUM_DIR)/process_keycode/process_rgb.c
+endif
+
 VARIABLE_TRACE ?= no
 ifneq ($(strip $(VARIABLE_TRACE)),no)
     SRC += $(QUANTUM_DIR)/variable_trace.c
@@ -628,11 +624,26 @@ ifeq ($(strip $(LED_TABLES)), yes)
     SRC += $(QUANTUM_DIR)/led_tables.c
 endif
 
+ifeq ($(strip $(SIGNALRGB_SUPPORT_ENABLE)), yes)
+    RAW_ENABLE := yes
+    SRC += $(QUANTUM_DIR)/signalrgb.c
+    OPT_DEFS += -DSIGNALRGB_SUPPORT_ENABLE
+endif
+
+
+ifeq ($(strip $(OPENRGB_ENABLE)), yes)
+    RAW_ENABLE := yes
+    SRC += $(QUANTUM_DIR)/openrgb.c
+    OPT_DEFS += -DOPENRGB_ENABLE
+endif
+
 ifeq ($(strip $(VIA_ENABLE)), yes)
     DYNAMIC_KEYMAP_ENABLE := yes
     RAW_ENABLE := yes
     BOOTMAGIC_ENABLE := yes
     TRI_LAYER_ENABLE := yes
+    SRC += $(QUANTUM_DIR)/via.c
+    OPT_DEFS += -DVIA_ENABLE
 endif
 
 VALID_CUSTOM_MATRIX_TYPES:= yes lite no
@@ -885,7 +896,7 @@ ifeq ($(strip $(BLUETOOTH_ENABLE)), yes)
     OPT_DEFS += -DBLUETOOTH_$(strip $(shell echo $(BLUETOOTH_DRIVER) | tr '[:lower:]' '[:upper:]'))
     NO_USB_STARTUP_CHECK := yes
     COMMON_VPATH += $(DRIVER_PATH)/bluetooth
-    SRC += outputselect.c process_connection.c
+    SRC += outputselect.c
 
     ifeq ($(strip $(BLUETOOTH_DRIVER)), bluefruit_le)
         SPI_DRIVER_REQUIRED = yes
@@ -940,7 +951,7 @@ ifeq ($(strip $(WS2812_DRIVER_REQUIRED)), yes)
 
     OPT_DEFS += -DWS2812_$(strip $(shell echo $(WS2812_DRIVER) | tr '[:lower:]' '[:upper:]'))
 
-    SRC += ws2812.c ws2812_$(strip $(WS2812_DRIVER)).c
+    SRC += ws2812_$(strip $(WS2812_DRIVER)).c
 
     ifeq ($(strip $(PLATFORM)), CHIBIOS)
         ifeq ($(strip $(WS2812_DRIVER)), pwm)
