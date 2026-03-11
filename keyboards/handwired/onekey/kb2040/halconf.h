@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:keyboards/handwired/onekey/kb2040/halconf.h
 /* Copyright 2020 QMK
+========
+/* Copyright 2021 Jessica Sullivan and Don Kjer
+>>>>>>>> master:keyboards/durgod/dgk6x/venus_iso/config.h
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +20,10 @@
 
 #pragma once
 
+<<<<<<<< HEAD:keyboards/handwired/onekey/kb2040/halconf.h
 #define HAL_USE_SPI TRUE
 
 #include_next <halconf.h>
+========
+#define CAPS_LED 29
+>>>>>>>> master:keyboards/durgod/dgk6x/venus_iso/config.h

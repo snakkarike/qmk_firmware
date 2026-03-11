@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:keyboards/ploopyco/nano_2/config.h
 /* Copyright 2024 Colin Lam (Ploopy Corporation)
+========
+/* Copyright 2025 @ Keychron (https://www.keychron.com)
+>>>>>>>> master:keyboards/keychron/c1_pro_v2/ansi/white/config.h
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +20,7 @@
 
 #pragma once
 
+<<<<<<<< HEAD:keyboards/ploopyco/nano_2/config.h
 #define UNUSABLE_PINS \
     { GP1, GP3, GP4, GP6, GP8, GP10, GP14, GP16, GP18, GP20, GP22, GP24, GP25, GP26, GP27, GP28, GP29 }
 
@@ -31,3 +36,12 @@
 #define SPI_SCK_PIN GP2
 #define SPI_MISO_PIN GP0
 #define SPI_MOSI_PIN GP7
+========
+/* LED Matrix Driver Configuration */
+#define SNLED27351_I2C_ADDRESS_1 SNLED27351_I2C_ADDRESS_GND
+
+/* Scan phase of led driver set as MSKPHASE_9CHANNEL(defined as 0x03 in CKLED2001.h) */
+#define SNLED27351_PHASE_CHANNEL SNLED27351_SCAN_PHASE_9_CHANNEL
+
+#define SNLED27351_CURRENT_TUNE { 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60 }
+>>>>>>>> master:keyboards/keychron/c1_pro_v2/ansi/white/config.h

@@ -41,3 +41,10 @@
 #include "solid_splash_anim.h"
 #include "solid_multi_splash_anim.h"
 #include "openrgb_direct_anim.h"
+
+// TODO: Add these back in when we figure out why they're not working
+//#include "starlight_smooth_anim.h"
+//#include "starlight_anim.h"
+//#include "starlight_dual_sat_anim.h"
+//#include "starlight_dual_hue_anim.h"
+//#include "riverflow_anim.h"

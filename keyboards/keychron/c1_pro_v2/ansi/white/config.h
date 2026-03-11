@@ -19,7 +19,15 @@
 /* LED Matrix Driver Configuration */
 #define SNLED27351_I2C_ADDRESS_1 SNLED27351_I2C_ADDRESS_GND
 
+<<<<<<<< HEAD:keyboards/keychron/c1_pro_v2/ansi/white/config.h
 /* Scan phase of led driver set as MSKPHASE_9CHANNEL(defined as 0x03 in CKLED2001.h) */
 #define SNLED27351_PHASE_CHANNEL SNLED27351_SCAN_PHASE_9_CHANNEL
 
 #define SNLED27351_CURRENT_TUNE { 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60 }
+========
+/* Use the first 8 channels of led driver */
+#define SNLED27351_PHASE_CHANNEL SNLED27351_SCAN_PHASE_8_CHANNEL
+
+/* Set LED driver current */
+#define SNLED27351_CURRENT_TUNE { 0x50, 0x50, 0x50, 0x50, 0x50, 0x50, 0x50, 0x50, 0x50, 0x50, 0x50, 0x50 }
+>>>>>>>> master:keyboards/keychron/c2_pro_v2/ansi/white/config.h

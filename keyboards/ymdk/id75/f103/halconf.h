@@ -16,6 +16,10 @@
 
 #pragma once
 
+<<<<<<<< HEAD:keyboards/ymdk/id75/f103/halconf.h
 #define HAL_USE_PWM TRUE
+========
+#define HAL_USE_SPI TRUE
+>>>>>>>> master:keyboards/handwired/onekey/kb2040/halconf.h
 
 #include_next <halconf.h>
