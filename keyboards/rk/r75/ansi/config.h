@@ -7,6 +7,7 @@
 #define DISABLE_MIDI
 #define DISABLE_SERIAL
 #define DISABLE_STENO
+#define NKRO_DEFAULT_ON true
 
 // #define DYNAMIC_KEYMAP_LAYER_COUNT 6 // 9 -- defaults to 4, now defined in keyboard.json
 // #define WEAR_LEVELING_LOGICAL_SIZE 2048 // defined below
@@ -35,6 +36,7 @@
 /* WS2812 */
 #define WS2812_SPI_DRIVER SPIDM2
 #define WS2812_SPI_DIVISOR 32
+#define WS2812_DRIVER spi
 
 // /* Default Effects */
 // #define RGB_MATRIX_DEFAULT_ON true
