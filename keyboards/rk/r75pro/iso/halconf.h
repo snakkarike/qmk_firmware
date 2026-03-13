@@ -1,4 +1,4 @@
-// Copyright 2024 SDK (@sdk66)
+// Copyright 2026 Saurabh Nakkarike (@snakkarike)
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #pragma once

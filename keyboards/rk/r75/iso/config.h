@@ -1,4 +1,4 @@
-// Copyright 2024 DV (@iamdanielv)
+// Copyright 2026 Saurabh Nakkarike (@snakkarike)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 

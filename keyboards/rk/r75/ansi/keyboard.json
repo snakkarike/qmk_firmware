@@ -1,7 +1,7 @@
 {
     "manufacturer": "RK",
     "keyboard_name": "Royal Kludge R75",
-    "maintainer": "sdk66",
+    "maintainer": "snakkarike",
     "bootloader": "wb32-dfu",
     "diode_direction": "ROW2COL",
     "encoder": {
@@ -123,7 +123,6 @@
             {"matrix": [5, 5], "x": 80, "y": 64, "flags": 4}
         ]
     },
-    "url": "",
     "usb": {
         "device_version": "0.0.1",
         "pid": "0xE484",
