@@ -114,6 +114,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #if defined(CRC_ENABLE)
 #    include "crc.h"
 #endif
+#ifdef VIAL_ENABLE
+#   include "vial.h"
+#endif
 #ifdef VIRTSER_ENABLE
 #    include "virtser.h"
 #endif

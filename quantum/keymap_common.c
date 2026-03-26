@@ -41,6 +41,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    include "process_midi.h"
 #endif
 
+#ifdef VIAL_ENABLE
+#    include "vial.h"
+#endif
+
 extern keymap_config_t keymap_config;
 
 /* converts key to action */
