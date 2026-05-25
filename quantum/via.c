@@ -301,18 +301,31 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
 
 // NEW begin
 
+#ifdef SIGNALRGB_SUPPORT_ENABLE
+    // Auto-switch to SignalRGB mode when SignalRGB initialization commands are received
+    if (data[0] == 0x21 || data[0] == 0x22 || data[0] == 0x23 || data[0] == 0x25) {
+        is_srgb_mode = 1;
 #ifdef OPENRGB_ENABLE
- if (is_orgb_mode) {
+        is_orgb_mode = 0;
+#endif
+    }
+#endif
+
+#ifdef OPENRGB_ENABLE
+    // If OpenRGB mode is active and the packet is not a SignalRGB command, route to OpenRGB.
+    // This prevents OpenRGB from stealing SignalRGB's packets.
+    if (is_orgb_mode && !(data[0] >= 0x21 && data[0] <= 0x28)) {
         orgb_raw_hid_receive(data, length);
         return;
- }
+    }
 #endif
 
 #ifdef SIGNALRGB_SUPPORT_ENABLE
- if (is_srgb_mode) {
+    // If SignalRGB mode is active, route to SignalRGB.
+    if (is_srgb_mode && data[0] >= 0x21 && data[0] <= 0x28) {
         srgb_raw_hid_receive(data, length);
         return;
- }
+    }
 #endif
 
 // NEW end 
