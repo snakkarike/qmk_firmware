@@ -324,6 +324,13 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     // If SignalRGB mode is active, route to SignalRGB.
     if (is_srgb_mode && data[0] >= 0x21 && data[0] <= 0x28) {
         srgb_raw_hid_receive(data, length);
+        
+        if (data[0] == 0x26) { // SET_SIGNALRGB_MODE_DISABLE
+            is_srgb_mode = 0;
+#ifdef OPENRGB_ENABLE
+            is_orgb_mode = 1;
+#endif
+        }
         return;
     }
 #endif
