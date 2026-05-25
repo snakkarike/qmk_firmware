@@ -35,6 +35,7 @@
 /* WS2812 */
 #define WS2812_SPI_DRIVER SPIDM2
 #define WS2812_SPI_DIVISOR 32
+#define WS2812_DRIVER spi
 
 // /* Default Effects */
 // #define RGB_MATRIX_DEFAULT_ON true
