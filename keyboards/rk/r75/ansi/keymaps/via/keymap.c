@@ -12,20 +12,20 @@
 #include "../../../features/socd_cleaner.h"
 
 void housekeeping_task_user(void) {
-    // Note: We can decide what to do with the MAC Led in this function
-    if (IS_LAYER_ON(2) || IS_LAYER_ON(3)) { // if the Ctl layer is active
-        gpio_write_pin_low(LED_MAC_PIN);    // low means turn on
-    } else {
-        gpio_write_pin_high(LED_MAC_PIN); // high means turn off
-    }
+    if (!keymap_config.no_gui) {
+        // Note: We can decide what to do with the MAC Led in this function
+        if (IS_LAYER_ON(2) || IS_LAYER_ON(3)) { // if the Ctl layer is active
+            gpio_write_pin_low(LED_MAC_PIN);    // low means turn on
+        } else {
+            gpio_write_pin_high(LED_MAC_PIN); // high means turn off
+        }
 
-    if (IS_LAYER_ON(1) || IS_LAYER_ON(4)) { // Check if the layer 2 is active
-        // Turn on the Win Lock LED when layer 2 is active
-        gpio_write_pin_low(LED_WIN_LOCK_PIN);
-    } else {
-        // Turn off the Win Lock LED when not on layer 2
-        gpio_write_pin_high(LED_WIN_LOCK_PIN);
-    } // else we have enabled no_gui, skip re-using the LED
+        if (IS_LAYER_ON(1) || IS_LAYER_ON(4)) { // Check if layer 1 or 4 is active
+            gpio_write_pin_low(LED_WIN_LOCK_PIN);
+        } else {
+            gpio_write_pin_high(LED_WIN_LOCK_PIN);
+        }
+    }
 }
 
 
@@ -181,13 +181,12 @@ case SWITCH_MODE:
             indicator_enqueue(40, 200, 3, 0x00, 0xFF, 0xFF); // Blink O Cyan
         } else {
             indicator_enqueue(40, 200, 3, 0xFF, 0x00, 0xFF); // Blink O Magenta (returning to VIA)
+            if (!is_srgb_mode) {
+                rgb_matrix_mode_noeeprom(rgb_matrix_config.mode);
+                rgb_matrix_sethsv_noeeprom(rgb_matrix_config.hsv.h, rgb_matrix_config.hsv.s, rgb_matrix_config.hsv.v);
+            }
         }
         rk_save_config();
-    }
-    // If both OpenRGB and SignalRGB are off, use the solid color mode
-    if (!is_orgb_mode && !is_srgb_mode) {
-        rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);  // Set solid color mode
-        rgb_matrix_sethsv_noeeprom(RGB_MATRIX_DEFAULT_HUE, RGB_MATRIX_DEFAULT_SAT, RGB_MATRIX_DEFAULT_VAL);  // Set default HSV
     }
 #endif
     return false;
@@ -202,13 +201,12 @@ case SIGNAL_MODE:
             indicator_enqueue(52, 200, 3, 0x00, 0xFF, 0x00); // Blink S Green
         } else {
             indicator_enqueue(52, 200, 3, 0xFF, 0x00, 0xFF); // Blink S Magenta (returning to VIA)
+            if (!is_orgb_mode) {
+                rgb_matrix_mode_noeeprom(rgb_matrix_config.mode);
+                rgb_matrix_sethsv_noeeprom(rgb_matrix_config.hsv.h, rgb_matrix_config.hsv.s, rgb_matrix_config.hsv.v);
+            }
         }
         rk_save_config();
-    }
-    // If both OpenRGB and SignalRGB are off, use the solid color mode
-    if (!is_orgb_mode && !is_srgb_mode) {
-        rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);  // Set solid color mode
-        rgb_matrix_sethsv_noeeprom(RGB_MATRIX_DEFAULT_HUE, RGB_MATRIX_DEFAULT_SAT, RGB_MATRIX_DEFAULT_VAL);  // Set default HSV
     }
 #endif
     return false;
@@ -233,6 +231,7 @@ case SIGNAL_MODE:
                 clear_keyboard(); // clear first buffer to prevent stuck keys
                 wait_ms(50);
                 keymap_config.nkro = !keymap_config.nkro;
+                eeconfig_update_keymap(&keymap_config);
                 blink_NKRO(keymap_config.nkro);
                 wait_ms(50);
                 clear_keyboard(); // clear first buffer to prevent stuck keys
@@ -242,16 +241,19 @@ case SIGNAL_MODE:
         case SOCDON: // Turn SOCD Cleaner on.
             if (record->event.pressed) {
                 socd_cleaner_set(true);
+                blink_SOCD(true);
             }
             return false;
         case SOCDOFF: // Turn SOCD Cleaner off.
             if (record->event.pressed) {
                 socd_cleaner_set(false);
+                blink_SOCD(false);
             }
             return false;
         case SOCDTOG: // Toggle SOCD Cleaner.
             if (record->event.pressed) {
                 socd_cleaner_toggle();
+                blink_SOCD(socd_cleaner_enabled);
             }
             return false;
         default:

@@ -13,8 +13,8 @@ bool process_rgb_keys(uint16_t keycode, keyrecord_t *record) {
                     case LED_FLAG_ALL: {
                         rgb_matrix_set_flags_noeeprom(LED_FLAG_INDICATOR);
                         // rgb_matrix_set_color_all(0, 0, 0);
-                        indicator_enqueue(79, 200, 3, INDICATOR_RGB_DARK_RED); // blink space too
-                        indicator_enqueue(78, 200, 3, INDICATOR_RGB_DARK_RED);  // blink left alt
+                        indicator_enqueue(R75_LED(79), 200, 3, INDICATOR_RGB_DARK_RED); // blink space too
+                        indicator_enqueue(R75_LED(78), 200, 3, INDICATOR_RGB_DARK_RED);  // blink left alt
                         indicator_enqueue(0, 200, 3, INDICATOR_RGB_DARK_RED); // blink right alt
                     } break;
                     default: {
@@ -100,10 +100,10 @@ bool process_rgb_keys(uint16_t keycode, keyrecord_t *record) {
                     indicator_enqueue(59, 200, 4, INDICATOR_RGB_DARK_RED); // L - SAI
                     indicator_enqueue(58, 200, 2, RGB_BLACK);              // K - SAD
                     blink_space(false);
+                } else {
+                    indicator_enqueue(59, 150, 1, RGB_WHITE); // L - SAI
                 }
                 rgb_matrix_increase_sat_noeeprom();
-            } else {
-                indicator_enqueue(59, 150, 1, RGB_WHITE); // L - SAI
             }
             return false;
         case QK_RGB_MATRIX_SATURATION_DOWN:
@@ -113,36 +113,36 @@ bool process_rgb_keys(uint16_t keycode, keyrecord_t *record) {
                     indicator_enqueue(59, 200, 2, RGB_BLACK);              // L - SAI
                     indicator_enqueue(58, 200, 4, INDICATOR_RGB_DARK_RED); // K - SAD
                     blink_space(false);
+                } else {
+                    indicator_enqueue(58, 150, 1, RGB_WHITE); // K - SAD
                 }
                 rgb_matrix_decrease_sat_noeeprom();
-            } else {
-                indicator_enqueue(59, 150, 1, RGB_WHITE); // K - SAD
             }
             return false;
         case QK_RGB_MATRIX_VALUE_UP:
             if (record->event.pressed) {
                 if (rgb_matrix_get_val() >= (RGB_MATRIX_MAXIMUM_BRIGHTNESS - RGB_MATRIX_VAL_STEP)) {
-                    indicator_enqueue(66, 200, 4, INDICATOR_RGB_DARK_RED); // . - VAI
-                    indicator_enqueue(67, 200, 2, RGB_BLACK);              // , - VAD
+                    indicator_enqueue(R75_LED(66), 200, 4, INDICATOR_RGB_DARK_RED); // . - VAI
+                    indicator_enqueue(R75_LED(67), 200, 2, RGB_BLACK);              // , - VAD
                     blink_space(false);
                     blink_arrows();
+                } else {
+                    indicator_enqueue(R75_LED(66), 150, 1, RGB_WHITE); // . - VAI
                 }
                 rgb_matrix_increase_val_noeeprom();
-            } else {
-                indicator_enqueue(66, 150, 1, RGB_WHITE); // . - VAI
             }
             return false;
         case QK_RGB_MATRIX_VALUE_DOWN:
             if (record->event.pressed) {
                 if (rgb_matrix_get_val() <= RGB_MATRIX_VAL_STEP) {
-                    indicator_enqueue(66, 200, 2, RGB_BLACK);              // . - VAI
-                    indicator_enqueue(67, 200, 4, INDICATOR_RGB_DARK_RED); // , - VAD
+                    indicator_enqueue(R75_LED(66), 200, 2, RGB_BLACK);              // . - VAI
+                    indicator_enqueue(R75_LED(67), 200, 4, INDICATOR_RGB_DARK_RED); // , - VAD
                     blink_space(false);
                     blink_arrows();
+                } else {
+                    indicator_enqueue(R75_LED(67), 150, 1, RGB_WHITE); // , - VAD
                 }
                 rgb_matrix_decrease_val_noeeprom();
-            } else {
-                indicator_enqueue(66, 150, 1, RGB_WHITE); // , - VAD
             }
             return false;
     }

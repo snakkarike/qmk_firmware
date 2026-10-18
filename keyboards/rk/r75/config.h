@@ -18,7 +18,9 @@
 #define LED_WIN_LOCK_PIN B9
 #define LED_MAC_PIN B8
 
-#define RGB_MATRIX_LED_COUNT 80
+#ifndef RGB_MATRIX_LED_COUNT
+#    define RGB_MATRIX_LED_COUNT 80
+#endif
 /* SPI */
 #define SPI_DRIVER SPIDQ
 #define SPI_SCK_PIN B3

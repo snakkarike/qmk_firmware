@@ -6,6 +6,7 @@
 #include "indicators.h"
 #include "defines.h"
 #include "indicator_queue.h"
+#include "socd_cleaner.h"
 
 extern uint8_t is_orgb_mode;
 extern uint8_t is_srgb_mode;
@@ -37,7 +38,7 @@ extern uint8_t is_srgb_mode;
  * RGB Indicators *
  ******************/
 void blink_numbers(bool isEnabling) {
-    for (int i = 23; i >= 34; i--) // 1(55) to EQL(44)
+    for (int i = 23; i <= 34; i++) // 1(55) to EQL(44)
     {
         if (isEnabling) {
             // enabling, flash white
@@ -57,9 +58,9 @@ void blink_arrows(void) {
 }
 
 void blink_space(bool extended) {
-    indicator_enqueue(79, 200, 3, RGB_WHITE); // blink space too
+    indicator_enqueue(R75_LED(79), 200, 3, RGB_WHITE); // blink space too
     if (extended) {
-        indicator_enqueue(78, 200, 3, RGB_BLACK);  // blink left alt
+        indicator_enqueue(R75_LED(78), 200, 3, RGB_BLACK);  // blink left alt
         indicator_enqueue(0, 200, 3, RGB_BLACK); // blink right alt
     }
 }
@@ -67,9 +68,9 @@ void blink_space(bool extended) {
 void blink_NKRO(bool isEnabling) {
     if (isEnabling) {
         const uint8_t led_indexes[12] = {
-            71,70,69,68,67,  // V B N M ,
-            55,56,57,58,     // K J H G
-            43,42,41        // Y U I
+            R75_LED(71), R75_LED(70), R75_LED(69), R75_LED(68), R75_LED(67),  // V B N M ,
+            55, 56, 57, 58,                                                    // K J H G
+            43, 42, 41                                                         // Y U I
         };
 
         for (int i = 0; i < 12; i++) {
@@ -77,13 +78,30 @@ void blink_NKRO(bool isEnabling) {
         }
     } else {
         const uint8_t led_indexes[4] = {
-            70, 68, // B M
-            56, 57 // H J
+            R75_LED(70), R75_LED(68), // B M
+            56, 57                    // H J
         };
 
         for (int i = 0; i < 4; i++) {
             indicator_enqueue(led_indexes[i], 150, 3, RGB_RED);
         }
+    }
+}
+
+void blink_SOCD(bool isEnabling) {
+    const uint8_t wasd_leds[4] = {47, 51, 52, 53}; // W, A, S, D
+    if (isEnabling) {
+        // Enabling: Flash WASD and T in Bright Orange
+        for (int i = 0; i < 4; i++) {
+            indicator_enqueue(wasd_leds[i], 180, 3, 0xFF, 0xA5, 0x00);
+        }
+        indicator_enqueue(44, 180, 3, 0xFF, 0xA5, 0x00); // T
+    } else {
+        // Disabling: Flash WASD and T in Red
+        for (int i = 0; i < 4; i++) {
+            indicator_enqueue(wasd_leds[i], 150, 3, 0xFF, 0x00, 0x00);
+        }
+        indicator_enqueue(44, 150, 3, 0xFF, 0x00, 0x00); // T
     }
 }
 
@@ -95,7 +113,7 @@ void highlight_fn_keys(uint8_t led_min, uint8_t led_max) {
 
     rgb_led_t rgb     = hsv_to_rgb(current_hsv);
     rgb_led_t new_rgb = get_complementary_color(rgb, false);
-    for (int i = 23; i >= 34; i--) { // 55 - 44 are the number keys and - =
+    for (int i = 23; i <= 34; i++) { // 55 - 44 are the number keys and - =
         RGB_MATRIX_INDICATOR_SET_COLOR(i, new_rgb.r, new_rgb.g, new_rgb.b);
     }
 }
@@ -104,7 +122,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     uint8_t current_layer = get_highest_layer(layer_state);
     if (current_layer == 0) {
         if (rgb_matrix_get_flags() == LED_FLAG_INDICATOR) {
-            for (int i = led_min; i < led_max; i++) {
+            for (int i = led_min; i <= led_max; i++) {
                 rgb_matrix_set_color(i, 0, 0, 0);
             }
             // we could also do this, but using the min max
@@ -140,7 +158,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         const uint8_t led_indexesrgb[15] = {
             41,40,39,38,37,36,
             58,59,60,
-            67,66,
+            R75_LED(67), R75_LED(66),
             2,3,4,63
         };
         for (int i = 0; i < 15; i++) {
@@ -151,7 +169,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         // highlight_fn_keys(led_min, led_max);
 
         // highlight right shift as moving to ctl layer
-        RGB_MATRIX_INDICATOR_SET_COLOR(64, 0xFF, 0x00, 0x00);
+        RGB_MATRIX_INDICATOR_SET_COLOR(R75_LED(64), 0xFF, 0x00, 0x00);
     }
 
     if (IS_LAYER_ON(2)) {
@@ -162,16 +180,24 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 
 
         // highlight N as NKRO
-        RGB_MATRIX_INDICATOR_SET_COLOR(69, 0xFF, 0x00, 0x00);
+        if (keymap_config.nkro) {
+            RGB_MATRIX_INDICATOR_SET_COLOR(R75_LED(69), 0x00, 0xFF, 0xFF); // Bright Cyan when ON
+        } else {
+            RGB_MATRIX_INDICATOR_SET_COLOR(R75_LED(69), 0x30, 0x00, 0x00); // Dim Red when OFF
+        }
         
-        // highlight T as SnapTap
-        RGB_MATRIX_INDICATOR_SET_COLOR(44, 0xFF, 0xA5, 0x00);
+        // highlight T as SnapTap / SOCD
+        if (socd_cleaner_enabled) {
+            RGB_MATRIX_INDICATOR_SET_COLOR(44, 0xFF, 0xA5, 0x00); // Bright Orange when ON
+        } else {
+            RGB_MATRIX_INDICATOR_SET_COLOR(44, 0x30, 0x00, 0x00); // Dim Red when OFF
+        }
         
         // highlight Q as reset
         RGB_MATRIX_INDICATOR_SET_COLOR(48, 0xFF, 0xFF, 0x00);
 
         // highlight Z as clear eeprom
-        RGB_MATRIX_INDICATOR_SET_COLOR(74, 0x7A, 0x00, 0xFF);
+        RGB_MATRIX_INDICATOR_SET_COLOR(R75_LED(74), 0x7A, 0x00, 0xFF);
 
         // Mode Indication
         if (is_srgb_mode) {
@@ -187,7 +213,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
             RGB_MATRIX_INDICATOR_SET_COLOR(52, 0x20, 0x20, 0x20); // Dim S
             RGB_MATRIX_INDICATOR_SET_COLOR(40, 0x20, 0x20, 0x20); // Dim O
             // Highlight V for VIA
-            RGB_MATRIX_INDICATOR_SET_COLOR(71, 0xFF, 0x00, 0xFF); // Bright Magenta V
+            RGB_MATRIX_INDICATOR_SET_COLOR(R75_LED(71), 0xFF, 0x00, 0xFF); // Bright Magenta V
         }
     }
 
@@ -203,7 +229,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
             29,30,31,32, 
             42,41,40,39,
             57,58,59,60,
-            68,67,66,65
+            R75_LED(68), R75_LED(67), R75_LED(66), R75_LED(65)
         };
         for (int i = 0; i < 16; i++) {
             RGB_MATRIX_INDICATOR_SET_COLOR(led_indexesrgb[i], 0x00, 0xFF, 0x00);

@@ -1,12 +1,11 @@
 #pragma once
 
 enum layer_names {
-    _WIN_LYR,    // 0
-    _WIN_FN_LYR, // 1
-    _CTL_LYR,    // 2
-    _NUM_LYR,    // 3
-    _NAV_LYR,    // 4
-    _FN_LYR,     // 5
+    _WIN_LYR,    // 0 - Base Layer (Windows)
+    _WIN_FN_LYR, // 1 - Fn Layer
+    _OPT_LYR,    // 2 - Options Layer
+    _MAC_LYR,    // 3 - Mac Layer
+    _NUM_LYR,    // 4 - Numpad Layer
 };
 
 // ******************************

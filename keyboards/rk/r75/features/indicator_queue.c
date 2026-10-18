@@ -1,5 +1,7 @@
 #include "indicator_queue.h"
 
+indicator_t indicator_queue[INDICATOR_QUEUE_MAX];
+
 rgb_led_t get_complementary_color(rgb_led_t rgb_led, bool darken) {
     uint8_t new_r = 0xFF - rgb_led.r;
     uint8_t new_g = 0xFF - rgb_led.g;

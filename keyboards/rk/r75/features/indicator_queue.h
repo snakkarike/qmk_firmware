@@ -39,7 +39,7 @@ typedef struct {
     uint8_t  b;
 } indicator_t;
 
-indicator_t indicator_queue[INDICATOR_QUEUE_MAX];
+extern indicator_t indicator_queue[INDICATOR_QUEUE_MAX];
 
 rgb_led_t get_complementary_color(rgb_led_t rgb_led, bool darken);
 
