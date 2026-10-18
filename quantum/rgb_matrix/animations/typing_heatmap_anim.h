@@ -79,9 +79,7 @@ bool TYPING_HEATMAP(effect_params_t* params) {
         for (uint8_t col = 0; col < MATRIX_COLS && RGB_MATRIX_LED_PROCESS_LIMIT; col++) {
             uint8_t val = g_rgb_frame_buffer[row][col];
 
-                HSV hsv = {170 - qsub8(val, 85), rgb_matrix_config.hsv.s, scale8((qadd8(170, val) - 170) * 3, rgb_matrix_config.hsv.v)};
-                RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
-                rgb_matrix_set_color(g_led_config.matrix_co[row][col], rgb.r, rgb.g, rgb.b);
+            bool processed = false;
 
             uint8_t led[LED_HITS_TO_REMEMBER];
             uint8_t led_count = rgb_matrix_map_row_column_to_led(row, col, led);
