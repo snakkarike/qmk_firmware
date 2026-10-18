@@ -1,6 +1,7 @@
 // Copyright 2026 Saurabh Nakkarike (@snakkarike)
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include QMK_KEYBOARD_H
+#include "../features/socd_cleaner.h"
 
 #define LED_ENABLE_PIN A5
 
@@ -20,6 +21,11 @@ void keyboard_pre_init_kb(void) {
     gpio_write_pin_high(LED_MAC_PIN);
 
     keyboard_pre_init_user();
+}
+
+void keyboard_post_init_kb(void) {
+    socd_cleaner_init();
+    keyboard_post_init_user();
 }
 
 void suspend_power_down_kb(void) {

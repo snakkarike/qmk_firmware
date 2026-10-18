@@ -136,6 +136,13 @@ bool process_socd_cleaner(uint16_t keycode, keyrecord_t* record,
 /** Determines globally whether SOCD cleaner is enabled. */
 extern bool socd_cleaner_enabled;
 
+void socd_cleaner_init(void);
+void socd_cleaner_set(bool enabled);
+void socd_cleaner_toggle(void);
+
+void rk_load_config(void);
+void rk_save_config(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -182,6 +182,7 @@ case SWITCH_MODE:
         } else {
             indicator_enqueue(40, 200, 3, 0xFF, 0x00, 0xFF); // Blink O Magenta (returning to VIA)
         }
+        rk_save_config();
     }
     // If both OpenRGB and SignalRGB are off, use the solid color mode
     if (!is_orgb_mode && !is_srgb_mode) {
@@ -202,6 +203,7 @@ case SIGNAL_MODE:
         } else {
             indicator_enqueue(52, 200, 3, 0xFF, 0x00, 0xFF); // Blink S Magenta (returning to VIA)
         }
+        rk_save_config();
     }
     // If both OpenRGB and SignalRGB are off, use the solid color mode
     if (!is_orgb_mode && !is_srgb_mode) {
@@ -239,17 +241,17 @@ case SIGNAL_MODE:
             return false;
         case SOCDON: // Turn SOCD Cleaner on.
             if (record->event.pressed) {
-                socd_cleaner_enabled = true;
+                socd_cleaner_set(true);
             }
             return false;
         case SOCDOFF: // Turn SOCD Cleaner off.
             if (record->event.pressed) {
-                socd_cleaner_enabled = false;
+                socd_cleaner_set(false);
             }
             return false;
         case SOCDTOG: // Toggle SOCD Cleaner.
             if (record->event.pressed) {
-                socd_cleaner_enabled = !socd_cleaner_enabled;
+                socd_cleaner_toggle();
             }
             return false;
         default:

@@ -12,6 +12,7 @@
 // #define DYNAMIC_KEYMAP_LAYER_COUNT 6 // 9 -- defaults to 4, now defined in keyboard.json
 // #define WEAR_LEVELING_LOGICAL_SIZE 2048 // defined below
 // #define WEAR_LEVELING_BACKING_SIZE 4096 // defined in keyboard.json
+#define EECONFIG_KB_DATA_SIZE 1
 
 // #define LED_CAPS_LOCK_PIN B0 // defined in keyboard.json
 #define LED_WIN_LOCK_PIN B9

@@ -21,12 +21,102 @@
  */
 
 #include "socd_cleaner.h"
+#include "eeconfig.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 bool socd_cleaner_enabled = true;
+
+#ifdef OPENRGB_ENABLE
+extern uint8_t is_orgb_mode;
+#endif
+
+#ifdef SIGNALRGB_SUPPORT_ENABLE
+extern uint8_t is_srgb_mode;
+#endif
+
+typedef union {
+    uint8_t raw;
+    struct {
+        bool socd_enabled : 1;
+        bool is_orgb_mode  : 1;
+        bool is_srgb_mode  : 1;
+    };
+} rk_config_t;
+
+#if (EECONFIG_KB_DATA_SIZE) > 0
+void rk_load_config(void) {
+    if (eeconfig_is_kb_datablock_valid()) {
+        rk_config_t cfg;
+        eeconfig_read_kb_datablock(&cfg.raw, 0, 1);
+        socd_cleaner_enabled = cfg.socd_enabled;
+#ifdef OPENRGB_ENABLE
+        is_orgb_mode = cfg.is_orgb_mode ? 1 : 0;
+#endif
+#ifdef SIGNALRGB_SUPPORT_ENABLE
+        is_srgb_mode = cfg.is_srgb_mode ? 1 : 0;
+#endif
+    } else {
+        eeconfig_init_kb_datablock();
+    }
+}
+
+void rk_save_config(void) {
+    rk_config_t cfg = {0};
+    cfg.socd_enabled = socd_cleaner_enabled;
+#ifdef OPENRGB_ENABLE
+    cfg.is_orgb_mode = is_orgb_mode ? 1 : 0;
+#endif
+#ifdef SIGNALRGB_SUPPORT_ENABLE
+    cfg.is_srgb_mode = is_srgb_mode ? 1 : 0;
+#endif
+    eeconfig_update_kb_datablock(&cfg.raw, 0, 1);
+}
+
+void eeconfig_init_kb_datablock(void) {
+    rk_config_t cfg = {0};
+    cfg.socd_enabled = 1;
+#ifdef OPENRGB_ENABLE
+    cfg.is_orgb_mode = 0;
+#endif
+#ifdef SIGNALRGB_SUPPORT_ENABLE
+    cfg.is_srgb_mode = 0;
+#endif
+    socd_cleaner_enabled = cfg.socd_enabled;
+#ifdef OPENRGB_ENABLE
+    is_orgb_mode = cfg.is_orgb_mode;
+#endif
+#ifdef SIGNALRGB_SUPPORT_ENABLE
+    is_srgb_mode = cfg.is_srgb_mode;
+#endif
+    eeconfig_update_kb_datablock(&cfg.raw, 0, 1);
+}
+
+void socd_cleaner_init(void) {
+    rk_load_config();
+}
+
+void socd_cleaner_set(bool enabled) {
+    socd_cleaner_enabled = enabled;
+    rk_save_config();
+}
+
+void socd_cleaner_toggle(void) {
+    socd_cleaner_set(!socd_cleaner_enabled);
+}
+#else
+void rk_load_config(void) {}
+void rk_save_config(void) {}
+void socd_cleaner_init(void) {}
+void socd_cleaner_set(bool enabled) {
+    socd_cleaner_enabled = enabled;
+}
+void socd_cleaner_toggle(void) {
+    socd_cleaner_enabled = !socd_cleaner_enabled;
+}
+#endif
 
 static void update_key(uint8_t keycode, bool press) {
   if (press) {
